@@ -1,0 +1,27 @@
+# Root .htaccess - Central routing configuration
+
+# Disable directory listing
+Options -Indexes
+
+# Set index file
+DirectoryIndex index.php index.html
+
+# Enable mod_rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /siapkak/
+    
+    # Pass Authorization header to PHP (PENTING untuk JWT)
+    RewriteCond %{HTTP:Authorization} ^(.*)
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%1]
+    
+    # Don't rewrite if it's a real file or directory
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Rewrite requests to index.php
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# Set environment variable for Authorization header (fallback)
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
